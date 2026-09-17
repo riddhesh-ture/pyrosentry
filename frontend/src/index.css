@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-deep: #050811;
+  --bg-panel: #0b1120;
+  --bg-card: #0f172a;
+  --border-dim: #1e293b;
+  --border-bright: #334155;
+  --cyan-neon: #00f0ff;
+  --amber-warn: #ffb700;
+  --crimson-crit: #ff003c;
+  --green-safe: #00ff66;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-deep);
+  color: #f1f5f9;
+  font-family: 'JetBrains Mono', 'Rajdhani', monospace, -apple-system, sans-serif;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.03) 0%, transparent 60%),
+    linear-gradient(rgba(15, 23, 42, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.3) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+}
+
+/* Custom telemetry scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* SCADA Industrial Panel Base */
+.scada-panel {
+  background-color: #0c1322;
+  border: 1px solid #1e293b;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.scada-panel-corner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-top: 2px solid #00f0ff;
+  border-left: 2px solid #00f0ff;
+}
+
+.scada-panel-corner::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 6px;
+  height: 6px;
+  border-bottom: 2px solid #00f0ff;
+  border-right: 2px solid #00f0ff;
+}
+
+/* Glowing text and borders */
+.glow-cyan {
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+}
+
+.glow-crimson {
+  text-shadow: 0 0 14px rgba(255, 0, 60, 0.8);
+}
+
+.glow-amber {
+  text-shadow: 0 0 12px rgba(255, 183, 0, 0.7);
+}
+
+.glow-green {
+  text-shadow: 0 0 12px rgba(0, 255, 102, 0.6);
+}
+
+/* Monospace telemetry digits */
+.num-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pulse badge animations */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.15); }
+}
+
+.pulse-badge {
+  animation: pulse-dot 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Emergency flash animation for high risk */
+@keyframes emergency-border-flash {
+  0%, 100% { border-color: rgba(255, 0, 60, 0.9); box-shadow: 0 0 25px rgba(255, 0, 60, 0.4); }
+  50% { border-color: rgba(255, 0, 60, 0.2); box-shadow: 0 0 5px rgba(255, 0, 60, 0.1); }
+}
+
+.emergency-flash {
+  animation: emergency-border-flash 1s infinite ease-in-out;
+}

@@ -1,0 +1,154 @@
+{
+  "model_architecture": "RandomForestClassifier",
+  "n_estimators": 100,
+  "max_depth": 12,
+  "features": [
+    "temp",
+    "humidity",
+    "smoke",
+    "lpg_gas",
+    "flame",
+    "dT_dt",
+    "dSmoke_dt",
+    "dGas_dt",
+    "gas_to_smoke_ratio",
+    "thermal_optical_interaction"
+  ],
+  "classes": [
+    "No Fire",
+    "Cooking Smoke",
+    "Gas Leak",
+    "Electrical Fire",
+    "LPG Fire"
+  ],
+  "overall_accuracy": 1.0,
+  "macro_f1": 1.0,
+  "weighted_f1": 1.0,
+  "confusion_matrix": [
+    [
+      4858,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      318,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      7038,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      124,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      188
+    ]
+  ],
+  "classification_report": {
+    "No Fire": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 4858.0
+    },
+    "Cooking Smoke": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 318.0
+    },
+    "Gas Leak": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 7038.0
+    },
+    "Electrical Fire": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 124.0
+    },
+    "LPG Fire": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 188.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 12526.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 12526.0
+    }
+  },
+  "feature_importances": [
+    [
+      "flame",
+      0.249
+    ],
+    [
+      "smoke",
+      0.2022
+    ],
+    [
+      "temp",
+      0.1594
+    ],
+    [
+      "lpg_gas",
+      0.1375
+    ],
+    [
+      "gas_to_smoke_ratio",
+      0.1128
+    ],
+    [
+      "humidity",
+      0.056
+    ],
+    [
+      "dT_dt",
+      0.0525
+    ],
+    [
+      "thermal_optical_interaction",
+      0.0184
+    ],
+    [
+      "dSmoke_dt",
+      0.0088
+    ],
+    [
+      "dGas_dt",
+      0.0035
+    ]
+  ],
+  "dataset_sample_count": 62630,
+  "train_sample_count": 50104,
+  "test_sample_count": 12526
+}
