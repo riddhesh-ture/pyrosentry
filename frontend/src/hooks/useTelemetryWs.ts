@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { TelemetryPacket, HistoricalTelemetryPoint } from '../types/telemetry';
+import { getWsUrl } from '../config';
 
-export function useTelemetryWs(url: string = 'ws://127.0.0.1:8000/ws/telemetry') {
+export function useTelemetryWs(url: string = getWsUrl()) {
   const [packet, setPacket] = useState<TelemetryPacket | null>(null);
   const [history, setHistory] = useState<HistoricalTelemetryPoint[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<'CONNECTED' | 'RECONNECTING' | 'OFFLINE' | 'CONNECTING'>('CONNECTING');

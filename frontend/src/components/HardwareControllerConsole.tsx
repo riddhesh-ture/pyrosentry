@@ -35,6 +35,7 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { TelemetryPacket } from '../types/telemetry';
 import { soundService } from '../utils/soundService';
+import { API_BASE_URL } from '../config';
 
 interface HardwareControllerConsoleProps {
   packet: TelemetryPacket | null;
@@ -67,7 +68,7 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
 
   // Fetch benchmark CSV runs on mount
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/replay/files')
+    fetch(`${API_BASE_URL}/api/replay/files`)
       .then((res) => res.json())
       .then((data) => {
         if (data.files && data.files.length > 0) {
@@ -138,7 +139,7 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
     };
 
     try {
-      await fetch('http://127.0.0.1:8000/api/simulator/manual', {
+      await fetch(`${API_BASE_URL}/api/simulator/manual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -151,7 +152,7 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
   const handleToggleManual = (enabled: boolean) => {
     setManualEnabled(enabled);
     if (!enabled) {
-      fetch('http://127.0.0.1:8000/api/simulator/manual', {
+      fetch(`${API_BASE_URL}/api/simulator/manual`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: false }),
@@ -163,12 +164,12 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
 
   const handleResetToAmbient = async () => {
     setManualEnabled(false);
-    await fetch('http://127.0.0.1:8000/api/simulator/reset', { method: 'POST' });
+    await fetch(`${API_BASE_URL}/api/simulator/reset`, { method: 'POST' });
   };
 
   const handleScenarioPreset = async (scenario: string) => {
     setManualEnabled(false);
-    await fetch('http://127.0.0.1:8000/api/scenario', {
+    await fetch(`${API_BASE_URL}/api/scenario`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scenario }),
@@ -180,7 +181,7 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
     if (faultType === 'mq2_disconnected') setMq2Fault(nextState);
     if (faultType === 'dht22_frozen') setDht22Fault(nextState);
 
-    await fetch('http://127.0.0.1:8000/api/fault', {
+    await fetch(`${API_BASE_URL}/api/fault`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fault_type: faultType, active: nextState }),
@@ -190,7 +191,7 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
   const handleSelectReplayFile = async (filename: string) => {
     setSelectedFile(filename);
     setManualEnabled(false);
-    await fetch('http://127.0.0.1:8000/api/replay/select', {
+    await fetch(`${API_BASE_URL}/api/replay/select`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filename, action: 'play' }),
@@ -200,7 +201,7 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
   const handleReplayControl = async (action: 'play' | 'pause' | 'rewind') => {
     if (action === 'play') setIsReplayPlaying(true);
     if (action === 'pause') setIsReplayPlaying(false);
-    await fetch('http://127.0.0.1:8000/api/replay/control', {
+    await fetch(`${API_BASE_URL}/api/replay/control`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action }),
@@ -241,9 +242,15 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
                   VIRTUAL EDGE SENSOR DAQ & HARDWARE CONTROLLER
                 </Typography>
                 <Chip
-                  label="ESP32-SENTRY-01"
+                  label={packet?.hardware_source?.includes('ESP32') ? packet.hardware_source : 'DEMO MODE: VIRTUAL CONTROLLER'}
                   size="small"
-                  sx={{ backgroundColor: '#1e293b', color: '#38bdf8', fontSize: '0.7rem', fontWeight: 800 }}
+                  sx={{
+                    backgroundColor: packet?.hardware_source?.includes('ESP32') ? 'rgba(0, 255, 102, 0.15)' : '#1e293b',
+                    color: packet?.hardware_source?.includes('ESP32') ? '#00ff66' : '#38bdf8',
+                    fontSize: '0.7rem',
+                    fontWeight: 800,
+                    border: packet?.hardware_source?.includes('ESP32') ? '1px solid #00ff66' : '1px solid #334155',
+                  }}
                 />
               </Box>
               <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.75rem' }}>
@@ -326,11 +333,11 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
             }}
           >
             {[
-              { id: 'NOMINAL', label: '1. Nominal Ambient', desc: '24°C, normal baseline' },
-              { id: 'COOKING_SMOKE', label: '2. Cooking Vapors', desc: '350 ppm smoke, flame=0' },
-              { id: 'GAS_LEAK', label: '3. LPG Gas Leak', desc: '850 ppm gas, flame=0' },
-              { id: 'ELECTRICAL_FIRE', label: '4. Electrical Short', desc: '48°C ohmic rise + smoke' },
-              { id: 'LPG_FIRE', label: '5. LPG Flashover', desc: '78°C + 950 gas + Flame=1' },
+              { id: 'NOMINAL', label: '1. Nominal Ambient', desc: '24°C, safe baseline' },
+              { id: 'COOKING_SMOKE', label: '2. Cooking Vapors', desc: '32°C warm pan, 360 ppm smoke, flame=0' },
+              { id: 'GAS_LEAK', label: '3. LPG Gas Leak', desc: '850 ppm gas, flame=0, safe temp' },
+              { id: 'ELECTRICAL_FIRE', label: '4. Electrical Short', desc: '68°C ohmic rise, 220 smoke, flame=0' },
+              { id: 'LPG_FIRE', label: '5. LPG Flashover', desc: '110°C thermal surge + 950 gas + Flame=1' },
             ].map((sc) => (
               <Button
                 key={sc.id}
@@ -439,14 +446,29 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
               <Typography variant="body2" sx={{ fontWeight: 700, color: '#cbd5e1' }}>
                 Temperature (°C)
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 900, color: temp > 50 ? '#ff003c' : '#00f0ff', fontFamily: 'monospace' }}>
+              <Typography variant="body2" sx={{ fontWeight: 900, color: temp > 80 ? '#ff003c' : temp > 45 ? '#fb923c' : '#00f0ff', fontFamily: 'monospace' }}>
                 {temp.toFixed(1)} °C
               </Typography>
             </Box>
+            {temp > 80.0 && (
+              <Chip
+                label="DHT22 SENSOR SATURATION (>80°C) — OPTICAL & GAS FUSION ACTIVE"
+                size="small"
+                sx={{
+                  mb: 1,
+                  backgroundColor: 'rgba(255, 0, 60, 0.15)',
+                  border: '1px solid #ff003c',
+                  color: '#ff003c',
+                  fontSize: '0.65rem',
+                  fontWeight: 900,
+                  width: '100%',
+                }}
+              />
+            )}
             <Slider
               value={temp}
-              min={15}
-              max={95}
+              min={-10}
+              max={120}
               step={0.5}
               onChange={(_, val) => {
                 const v = val as number;
@@ -454,17 +476,19 @@ export const HardwareControllerConsole: React.FC<HardwareControllerConsoleProps>
                 if (manualEnabled) sendManualUpdate({ temp: v });
               }}
               sx={{
-                color: temp > 50 ? '#ff003c' : '#00f0ff',
+                color: temp > 80 ? '#ff003c' : temp > 45 ? '#fb923c' : '#00f0ff',
                 '& .MuiSlider-thumb': {
-                  boxShadow: temp > 50 ? '0 0 10px #ff003c' : '0 0 10px #00f0ff',
+                  boxShadow: temp > 80 ? '0 0 12px #ff003c' : temp > 45 ? '0 0 10px #fb923c' : '0 0 10px #00f0ff',
                 },
               }}
             />
-            <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+            <Stack direction="row" spacing={0.8} sx={{ mt: 0.5, flexWrap: 'wrap', gap: 0.5 }}>
               {[
-                { label: 'Room (24°)', val: 24 },
-                { label: 'Smolder (42°)', val: 42 },
-                { label: 'Firestorm (78°)', val: 78 },
+                { label: 'Ambient (24°)', val: 24 },
+                { label: 'Smolder (48°)', val: 48 },
+                { label: 'Overheat (72°)', val: 72 },
+                { label: 'Saturation (85°)', val: 85 },
+                { label: 'Flashover (110°)', val: 110 },
               ].map((pt) => (
                 <Button
                   key={pt.label}

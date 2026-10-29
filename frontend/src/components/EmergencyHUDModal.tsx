@@ -15,6 +15,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { AlertState, HazardPrediction } from '../types/telemetry';
 import { soundService } from '../utils/soundService';
+import { API_BASE_URL } from '../config';
 
 interface EmergencyHUDModalProps {
   alertState: AlertState | undefined;
@@ -50,7 +51,7 @@ export const EmergencyHUDModal: React.FC<EmergencyHUDModalProps> = ({
   const handleAcknowledge = async () => {
     soundService.stopSiren();
     try {
-      await fetch('http://127.0.0.1:8000/api/alert/acknowledge', { method: 'POST' });
+      await fetch(`${API_BASE_URL}/api/alert/acknowledge`, { method: 'POST' });
     } catch (e) {
       console.error('Failed to acknowledge alert:', e);
     }

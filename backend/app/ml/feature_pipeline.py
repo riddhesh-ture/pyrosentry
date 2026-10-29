@@ -1,5 +1,5 @@
 """
-Feature Pipeline & Rolling Window Derivative Engine for VIT FF180 Fire Detection.
+Feature Pipeline & Rolling Window Derivative Engine for PYROSENTRY AI.
 Computes 1st-order discrete rate-of-rise metrics (dT/dt, dSmoke/dt, dGas/dt)
 and multi-sensor interaction ratios over a sliding window (W=5s).
 """

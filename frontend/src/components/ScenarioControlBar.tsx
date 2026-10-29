@@ -21,6 +21,7 @@ import ScienceIcon from '@mui/icons-material/Science';
 import StorageIcon from '@mui/icons-material/Storage';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { TelemetryPacket } from '../types/telemetry';
+import { API_BASE_URL } from '../config';
 
 interface ScenarioControlBarProps {
   packet: TelemetryPacket | null;
@@ -45,7 +46,7 @@ export const ScenarioControlBar: React.FC<ScenarioControlBarProps> = ({ packet }
   }, [packet]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/replay/files')
+    fetch(`${API_BASE_URL}/api/replay/files`)
       .then((res) => res.json())
       .then((data) => {
         if (data.files) {
@@ -59,7 +60,7 @@ export const ScenarioControlBar: React.FC<ScenarioControlBarProps> = ({ packet }
   const handleScenarioChange = async (scenario: string) => {
     setActiveScenario(scenario);
     setActiveMode('SIMULATION');
-    await fetch('http://127.0.0.1:8000/api/scenario', {
+    await fetch(`${API_BASE_URL}/api/scenario`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scenario }),
@@ -68,7 +69,7 @@ export const ScenarioControlBar: React.FC<ScenarioControlBarProps> = ({ packet }
 
   const handleModeChange = async (mode: string) => {
     setActiveMode(mode);
-    await fetch('http://127.0.0.1:8000/api/mode', {
+    await fetch(`${API_BASE_URL}/api/mode`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode }),
@@ -78,7 +79,7 @@ export const ScenarioControlBar: React.FC<ScenarioControlBarProps> = ({ packet }
   const handleSelectReplayFile = async (filename: string) => {
     setSelectedFile(filename);
     setActiveMode('CSV_REPLAY');
-    await fetch('http://127.0.0.1:8000/api/replay/select', {
+    await fetch(`${API_BASE_URL}/api/replay/select`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filename, action: 'play' }),
@@ -88,7 +89,7 @@ export const ScenarioControlBar: React.FC<ScenarioControlBarProps> = ({ packet }
   const handleReplayControl = async (action: 'play' | 'pause' | 'rewind') => {
     if (action === 'play') setIsPlaying(true);
     if (action === 'pause') setIsPlaying(false);
-    await fetch('http://127.0.0.1:8000/api/replay/control', {
+    await fetch(`${API_BASE_URL}/api/replay/control`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action }),
@@ -100,7 +101,7 @@ export const ScenarioControlBar: React.FC<ScenarioControlBarProps> = ({ packet }
     if (faultType === 'mq2_disconnected') setMq2Fault(nextState);
     if (faultType === 'dht22_frozen') setDht22Fault(nextState);
 
-    await fetch('http://127.0.0.1:8000/api/fault', {
+    await fetch(`${API_BASE_URL}/api/fault`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fault_type: faultType, active: nextState }),

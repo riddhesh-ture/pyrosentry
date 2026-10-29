@@ -2,8 +2,8 @@
 set -e
 
 echo "=============================================================================="
-echo "  VIT PUNE - PROJECT FF NO. 180 (GROUP TY-CS-L9)"
-echo "  AI-BASED SMART FIRE DETECTION & EMERGENCY RESPONSE SYSTEM"
+echo "  PYROSENTRY AI - INDUSTRIAL MULTI-SENSOR FIRE & HAZARD TELEMETRY SCADA"
+echo "  REAL-TIME ML EDGE INFERENCE & EXPLAINABLE AI (XAI) PLATFORM"
 echo "=============================================================================="
 echo "[1/4] Checking system prerequisites..."
 

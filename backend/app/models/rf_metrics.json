@@ -21,36 +21,36 @@
     "Electrical Fire",
     "LPG Fire"
   ],
-  "overall_accuracy": 1.0,
-  "macro_f1": 1.0,
-  "weighted_f1": 1.0,
+  "overall_accuracy": 0.9997,
+  "macro_f1": 0.9993,
+  "weighted_f1": 0.9997,
   "confusion_matrix": [
     [
-      4858,
+      5014,
+      1,
       0,
+      1,
+      0
+    ],
+    [
+      0,
+      577,
       0,
       0,
       0
     ],
     [
       0,
-      318,
       0,
-      0,
-      0
-    ],
-    [
-      0,
-      0,
-      7038,
+      7117,
       0,
       0
     ],
     [
+      3,
       0,
       0,
-      0,
-      124,
+      976,
       0
     ],
     [
@@ -58,97 +58,97 @@
       0,
       0,
       0,
-      188
+      677
     ]
   ],
   "classification_report": {
     "No Fire": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
-      "support": 4858.0
+      "precision": 0.9994020330875025,
+      "recall": 0.9996012759170654,
+      "f1-score": 0.9995016445729094,
+      "support": 5016.0
     },
     "Cooking Smoke": {
-      "precision": 1.0,
+      "precision": 0.9982698961937716,
       "recall": 1.0,
-      "f1-score": 1.0,
-      "support": 318.0
+      "f1-score": 0.9991341991341991,
+      "support": 577.0
     },
     "Gas Leak": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 7038.0
+      "support": 7117.0
     },
     "Electrical Fire": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
-      "support": 124.0
+      "precision": 0.9989764585465711,
+      "recall": 0.9969356486210419,
+      "f1-score": 0.9979550102249489,
+      "support": 979.0
     },
     "LPG Fire": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 188.0
+      "support": 677.0
     },
-    "accuracy": 1.0,
+    "accuracy": 0.9996519560072393,
     "macro avg": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
-      "support": 12526.0
+      "precision": 0.999329677565569,
+      "recall": 0.9993073849076215,
+      "f1-score": 0.9993181707864114,
+      "support": 14366.0
     },
     "weighted avg": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1-score": 1.0,
-      "support": 12526.0
+      "precision": 0.9996519755664632,
+      "recall": 0.9996519560072393,
+      "f1-score": 0.9996518611365983,
+      "support": 14366.0
     }
   },
   "feature_importances": [
     [
-      "flame",
-      0.249
+      "lpg_gas",
+      0.1775
     ],
     [
       "smoke",
-      0.2022
+      0.1642
     ],
     [
       "temp",
-      0.1594
-    ],
-    [
-      "lpg_gas",
-      0.1375
-    ],
-    [
-      "gas_to_smoke_ratio",
-      0.1128
-    ],
-    [
-      "humidity",
-      0.056
+      0.1612
     ],
     [
       "dT_dt",
-      0.0525
+      0.14
     ],
     [
-      "thermal_optical_interaction",
-      0.0184
+      "flame",
+      0.1301
     ],
     [
-      "dSmoke_dt",
-      0.0088
+      "gas_to_smoke_ratio",
+      0.1035
+    ],
+    [
+      "humidity",
+      0.0397
     ],
     [
       "dGas_dt",
-      0.0035
+      0.0358
+    ],
+    [
+      "dSmoke_dt",
+      0.029
+    ],
+    [
+      "thermal_optical_interaction",
+      0.0189
     ]
   ],
-  "dataset_sample_count": 62630,
-  "train_sample_count": 50104,
-  "test_sample_count": 12526
+  "dataset_sample_count": 71830,
+  "train_sample_count": 57464,
+  "test_sample_count": 14366
 }

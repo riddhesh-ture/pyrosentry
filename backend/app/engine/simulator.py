@@ -2,11 +2,11 @@
 Physics-Based Telemetry Generator & Sensor Emulation Engine.
 Generates mathematically grounded time-series profiles reflecting physical hazard dynamics:
 - NOMINAL: Ambient thermal equilibrium with sensor jitter
-- COOKING_SMOKE: Aerosol particulate ramp without thermal acceleration (dT/dt ~ 0)
+- COOKING_SMOKE: Aerosol particulate ramp without thermal acceleration (dT/dt ~ 0) up to 38°C
 - GAS_LEAK: Diffusive LPG fuel accumulation without flame
-- ELECTRICAL_FIRE: Ohmic heating (Joule heating dT/dt > 0) + smoldering smoke ramp
-- LPG_FIRE: Compound catastrophe: gas pre-saturation + rapid thermal runaway + flame
-Supports real-time manual slider overrides and sensor fault emulation.
+- ELECTRICAL_FIRE: Ohmic heating (Joule heating dT/dt > 0) + smoldering smoke ramp (flame=0 initially)
+- LPG_FIRE: Compound catastrophe: gas pre-saturation + rapid thermal runaway (up to 115°C+) + flame
+Supports real-time manual slider overrides (up to 120°C) and sensor fault emulation.
 """
 
 import math
@@ -76,10 +76,10 @@ class PhysicsSimulator:
         if self.manual_override_active:
             # When manual override is active, use values set by the controller sliders
             # with slight Gaussian micro-jitter for physical realism
-            self.temp = self.manual_values["temp"] + random.gauss(0, 0.05)
-            self.humidity = self.manual_values["humidity"] + random.gauss(0, 0.1)
-            self.smoke = max(0.0, self.manual_values["smoke"] + random.gauss(0, 0.5))
-            self.lpg_gas = max(0.0, self.manual_values["lpg_gas"] + random.gauss(0, 0.5))
+            self.temp = max(-10.0, min(120.0, self.manual_values["temp"] + random.gauss(0, 0.05)))
+            self.humidity = max(5.0, min(95.0, self.manual_values["humidity"] + random.gauss(0, 0.1)))
+            self.smoke = max(0.0, min(2000.0, self.manual_values["smoke"] + random.gauss(0, 0.5)))
+            self.lpg_gas = max(0.0, min(2500.0, self.manual_values["lpg_gas"] + random.gauss(0, 0.5)))
             self.flame = max(0.0, min(1.0, self.manual_values["flame"]))
 
         elif self.active_scenario == "NOMINAL":
@@ -90,11 +90,12 @@ class PhysicsSimulator:
             self.flame = 0.0
 
         elif self.active_scenario == "COOKING_SMOKE":
-            target_smoke = 22.0 + 340.0 * (1.0 - math.exp(-t / 18.0))
+            target_smoke = 22.0 + 360.0 * (1.0 - math.exp(-t / 18.0))
             self.smoke = max(20.0, target_smoke + random.gauss(0, 8.0))
-            self.temp = 25.0 + 0.05 * math.sin(t * 0.1) + random.gauss(0, 0.15)
-            self.humidity = 48.0 - 5.0 * (1.0 - math.exp(-t / 25.0)) + random.gauss(0, 0.3)
-            self.lpg_gas = 35.0 + random.gauss(0, 2.5)
+            # Kitchen temperature can gently warm up to ~32°C near frying pan, but dT/dt is very low
+            self.temp = 25.0 + 5.0 * (1.0 - math.exp(-t / 40.0)) + random.gauss(0, 0.15)
+            self.humidity = min(85.0, 52.0 + 12.0 * (1.0 - math.exp(-t / 30.0)) + random.gauss(0, 0.4))
+            self.lpg_gas = 30.0 + random.gauss(0, 2.5)
             self.flame = 0.0
 
         elif self.active_scenario == "GAS_LEAK":
@@ -106,24 +107,27 @@ class PhysicsSimulator:
             self.flame = 0.0
 
         elif self.active_scenario == "ELECTRICAL_FIRE":
-            self.temp = min(68.0, 26.0 + 0.45 * t + random.gauss(0, 0.2))
-            target_smoke = 20.0 + 190.0 * (1.0 - math.exp(-t / 22.0))
+            # Early ohmic warming up to ~75°C, smoldering insulation, flame = 0 initially
+            self.temp = min(82.0, 26.0 + 0.55 * t + random.gauss(0, 0.2))
+            target_smoke = 20.0 + 220.0 * (1.0 - math.exp(-t / 20.0))
             self.smoke = max(20.0, target_smoke + random.gauss(0, 6.0))
-            self.lpg_gas = 45.0 + 15.0 * (1.0 - math.exp(-t / 30.0)) + random.gauss(0, 3.0)
+            self.lpg_gas = 35.0 + 15.0 * (1.0 - math.exp(-t / 30.0)) + random.gauss(0, 3.0)
             self.humidity = max(18.0, 50.0 - 0.25 * t + random.gauss(0, 0.4))
-            if t > 15.0:
+            # Flame only sparks in later stage (t > 22 seconds)
+            if t > 22.0:
                 self.flame = min(1.0, max(0.0, 0.45 + 0.35 * math.sin(t * 0.8) + random.gauss(0, 0.1)))
             else:
                 self.flame = 0.0
 
         elif self.active_scenario == "LPG_FIRE":
-            self.temp = min(92.0, 27.0 + 58.0 * (1.0 - math.exp(-t / 8.0)) + 0.35 * t + random.gauss(0, 0.4))
-            target_gas = 450.0 + 600.0 * (1.0 - math.exp(-t / 10.0))
+            # Open combustion & flashover: temperature surges to 110°C+
+            self.temp = min(115.0, 27.0 + 72.0 * (1.0 - math.exp(-t / 8.0)) + 0.45 * t + random.gauss(0, 0.4))
+            target_gas = 450.0 + 650.0 * (1.0 - math.exp(-t / 10.0))
             self.lpg_gas = max(300.0, target_gas + random.gauss(0, 15.0))
-            target_smoke = 180.0 + 520.0 * (1.0 - math.exp(-t / 12.0))
+            target_smoke = 180.0 + 550.0 * (1.0 - math.exp(-t / 12.0))
             self.smoke = max(150.0, target_smoke + random.gauss(0, 18.0))
-            self.humidity = max(12.0, 48.0 - 0.5 * t + random.gauss(0, 0.5))
-            self.flame = min(1.0, 0.90 + random.gauss(0, 0.05))
+            self.humidity = max(10.0, 48.0 - 0.6 * t + random.gauss(0, 0.5))
+            self.flame = min(1.0, 0.92 + random.gauss(0, 0.04))
 
         # Fault Injections
         output_temp = self.frozen_temp if self.dht22_frozen else self.temp

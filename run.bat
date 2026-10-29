@@ -2,8 +2,8 @@
 setlocal enabledelayedexpansion
 
 echo ==============================================================================
-echo   VIT PUNE - PROJECT FF NO. 180 (GROUP TY-CS-L9)
-echo   AI-BASED SMART FIRE DETECTION & EMERGENCY RESPONSE SYSTEM
+echo   PYROSENTRY AI - INDUSTRIAL MULTI-SENSOR FIRE & HAZARD TELEMETRY SCADA
+echo   REAL-TIME ML EDGE INFERENCE & EXPLAINABLE AI (XAI) PLATFORM
 echo ==============================================================================
 echo [1/4] Checking system prerequisites...
 
@@ -44,7 +44,7 @@ if not exist "frontend\node_modules" (
 echo.
 echo [4/4] Launching System Services...
 echo [INFO] Starting FastAPI Daemon on http://127.0.0.1:8000...
-start "VIT-FF180-Backend" cmd /c "python backend\run_backend.py"
+start "PYROSENTRY-Backend-Daemon" cmd /c "python backend\run_backend.py"
 
 timeout /t 2 >nul
 

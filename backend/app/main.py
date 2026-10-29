@@ -6,6 +6,7 @@ Streams 1 Hz real-time telemetry packets over WebSockets containing:
 - Instant Tree-Path XAI feature attributions
 - Composite Fire Risk Score (0-100%) & Tiered Emergency Alerting
 - Interactive Simulation Scenario Overrides & CSV Replay Mode
+- Dual Ingestion Engine: Live ESP32 UART with zero-crash fallback to Virtual Controller
 """
 
 import os
@@ -126,15 +127,19 @@ async def telemetry_worker():
             frame_counter += 1
             start_time = time.perf_counter()
 
-            # 1. Acquire raw sensor readings based on active mode
-            if current_mode == "HARDWARE_SERIAL" and serial_adapter.is_connected:
-                raw_packet = serial_adapter.read_packet()
-                if raw_packet is None:
-                    raw_packet = simulator.step()
+            # 1. Seamless Dual Ingestion: Check physical ESP32 UART first
+            hw_packet = serial_adapter.read_packet()
+            if hw_packet is not None:
+                current_mode = "HARDWARE_SERIAL"
+                raw_packet = hw_packet
+                hardware_source = serial_adapter.source_label
             elif current_mode == "CSV_REPLAY":
                 raw_packet = replay_manager.step()
+                hardware_source = f"CSV_REPLAY ({replay_manager.active_file})"
             else:
+                current_mode = "SIMULATION"
                 raw_packet = simulator.step()
+                hardware_source = "VIRTUAL_CONTROLLER"
 
             # 2. Update Feature Buffer & Extract 10D Feature Vector
             features = feature_buffer.update(
@@ -215,7 +220,8 @@ async def telemetry_worker():
 
             fault_payload = SensorFaultState(
                 mq2_disconnected=simulator.mq2_disconnected,
-                dht22_frozen=simulator.dht22_frozen
+                dht22_frozen=simulator.dht22_frozen,
+                dht22_saturated=(features["temp"] > 80.0)
             )
 
             active_scenario_name = (
@@ -227,6 +233,7 @@ async def telemetry_worker():
                 timestamp=datetime.now().strftime("%H:%M:%S"),
                 frame_id=frame_counter,
                 mode=current_mode,
+                hardware_source=hardware_source,
                 active_scenario=active_scenario_name,
                 sensors=sensors_payload,
                 derivatives=derivatives_payload,
@@ -262,7 +269,6 @@ async def websocket_telemetry(websocket: WebSocket):
         while True:
             # Keep socket alive and accept client control messages if any
             client_msg = await websocket.receive_text()
-            # Can parse client actions here if needed
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception:
@@ -276,12 +282,14 @@ def get_status():
     return {
         "status": "ONLINE",
         "mode": current_mode,
+        "hardware_source": serial_adapter.source_label,
         "scenario": simulator.active_scenario,
         "replay_file": replay_manager.active_file,
         "replay_playing": replay_manager.is_playing,
         "frame_id": frame_counter,
         "connected_clients": len(manager.active_connections),
         "hardware_serial_connected": serial_adapter.is_connected,
+        "active_port": serial_adapter.active_port_name,
         "manual_override_active": simulator.manual_override_active,
         "manual_values": simulator.manual_values
     }
@@ -315,7 +323,6 @@ def reset_simulator():
         "scenario": simulator.active_scenario
     }
 
-
 @app.post("/api/scenario")
 def switch_scenario(req: ScenarioSwitchRequest):
     global current_mode
@@ -326,10 +333,10 @@ def switch_scenario(req: ScenarioSwitchRequest):
 @app.post("/api/mode")
 def switch_mode(req: ModeSwitchRequest):
     global current_mode
-    if req.mode in ["SIMULATION", "CSV_REPLAY"]:
+    if req.mode in ["SIMULATION", "CSV_REPLAY", "HARDWARE_SERIAL"]:
         current_mode = req.mode
         return {"status": "SUCCESS", "mode": current_mode}
-    raise HTTPException(status_code=400, detail="Invalid mode. Choose SIMULATION or CSV_REPLAY.")
+    raise HTTPException(status_code=400, detail="Invalid mode. Choose SIMULATION, CSV_REPLAY, or HARDWARE_SERIAL.")
 
 @app.get("/api/replay/files")
 def list_replay_files():

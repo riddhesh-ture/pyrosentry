@@ -29,6 +29,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { VivaMetrics } from '../types/telemetry';
+import { API_BASE_URL } from '../config';
 
 interface ModelAuditModalProps {
   isOpen: boolean;
@@ -44,7 +45,7 @@ export const ModelAuditModal: React.FC<ModelAuditModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      fetch('http://127.0.0.1:8000/api/metrics')
+      fetch(`${API_BASE_URL}/api/metrics`)
         .then((res) => res.json())
         .then((data) => setMetrics(data))
         .catch(() => {});

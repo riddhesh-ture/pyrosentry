@@ -198,7 +198,9 @@ export const Header: React.FC<HeaderProps> = ({
                 display: { xs: 'none', md: 'block' },
               }}
             >
-              NODE: <span style={{ color: '#f8fafc' }}>ESP32-01</span>
+              SRC: <span style={{ color: packet?.hardware_source?.includes('ESP32') ? '#00ff66' : '#38bdf8' }}>
+                {packet?.hardware_source?.includes('ESP32') ? packet.hardware_source : 'DEMO CONTROLLER'}
+              </span>
             </Typography>
 
             <Divider

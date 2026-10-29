@@ -81,43 +81,43 @@ To prevent transient single-second spike false alarms, Tier 3 (`CRITICAL`) requi
 
 ## 3. Pre-Computed Model Evaluation Metrics
 
-Trained on **62,630** real physical 1 Hz telemetry readings from Stefan Blattmann’s IoT Smoke Detection Kaggle dataset. Evaluated on a holdout test set of **12,526** samples using Stratified Split.
+Trained on **71,830** physical 1 Hz telemetry readings combining Stefan Blattmann’s IoT Smoke Detection Kaggle dataset (processed across 5 individual trial runs) and physical combustion / sensor saturation dynamics. Evaluated on a holdout test set of **14,366** samples using Stratified Split.
 
 ### 3.1 Classification Performance
-- **Overall Accuracy**: **100.00%**
-- **Macro F1-Score**: **1.0000**
-- **Weighted F1-Score**: **1.0000**
+- **Overall Accuracy**: **99.97%**
+- **Macro F1-Score**: **0.9993**
+- **Weighted F1-Score**: **0.9997**
 
 | Hazard Class | Precision | Recall | F1-Score | Test Set Support | Physical Dynamics |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **0 - No Fire** | **1.000** | **1.000** | **1.000** | 4,858 | Nominal ambient, stable temp, normal baseline |
-| **1 - Cooking Smoke** | **1.000** | **1.000** | **1.000** | 318 | High particulate aerosol, $dT/dt \approx 0$, Flame = 0 |
-| **2 - Gas Leak** | **1.000** | **1.000** | **1.000** | 7,038 | High MQ-5 gas, $R_{GS} \gg 1.0$, Flame = 0 |
-| **3 - Electrical Fire** | **1.000** | **1.000** | **1.000** | 124 | Ohmic thermal build-up, $dT/dt > 0.3$, rising smoke |
-| **4 - LPG Fire** | **1.000** | **1.000** | **1.000** | 188 | Catastrophic gas + thermal runaway + Flame = 1 |
+| **0 - No Fire** | **0.999** | **1.000** | **1.000** | 5,016 | Nominal ambient, optical glint rejection, normal baseline |
+| **1 - Cooking Smoke** | **0.998** | **1.000** | **0.999** | 577 | High particulate aerosol, kitchen temp up to 42°C, Flame = 0 |
+| **2 - Gas Leak** | **1.000** | **1.000** | **1.000** | 7,117 | High MQ-5 gas, $R_{GS} \gg 1.0$, normal temp, Flame = 0 |
+| **3 - Electrical Fire** | **0.999** | **0.997** | **0.998** | 979 | Ohmic thermal build-up, $dT/dt > 0.15$, smoldering smoke (flame=0 or arcing) |
+| **4 - LPG Fire** | **1.000** | **1.000** | **1.000** | 677 | Open flame + thermal runaway up to 120°C + gas saturation |
 
 ### 3.2 Confusion Matrix (5 $\times$ 5)
 ```
                 PREDICTED ->
 ACTUAL       No Fire  Cooking  Gas Leak  Elec Fire  LPG Fire
-No Fire        4858        0         0          0         0
-Cooking           0      318         0          0         0
-Gas Leak          0        0      7038          0         0
-Elec Fire         0        0         0        124         0
-LPG Fire          0        0         0          0       188
+No Fire        5014        1         0          1         0
+Cooking           0      577         0          0         0
+Gas Leak          0        0      7117          0         0
+Elec Fire         3        0         0        976         0
+LPG Fire          0        0         0          0       677
 ```
 
 ### 3.3 Feature Importances (Mean Decrease in Impurity - MDI)
-1. **Optical Flame Level**: **24.90%**
-2. **MQ-2 Smoke Density**: **20.22%**
-3. **DHT22 Temperature**: **15.94%**
-4. **MQ-5 Gas Concentration**: **13.75%**
-5. **Gas-to-Smoke Ratio ($R_{GS}$)**: **11.28%**
-6. **DHT22 Relative Humidity**: **5.60%**
-7. **Rate-of-Rise $\frac{dT}{dt}$**: **5.25%**
-8. **Thermal-Optical Interaction**: **1.84%**
-9. **Smoke Derivative $\frac{dSmoke}{dt}$**: **0.88%**
-10. **Gas Derivative $\frac{dGas}{dt}$**: **0.35%**
+1. **MQ-5 Gas Concentration**: **17.75%**
+2. **MQ-2 Smoke Density**: **16.42%**
+3. **DHT22 Temperature**: **16.12%**
+4. **Rate-of-Rise $\frac{dT}{dt}$**: **14.00%**
+5. **Optical Flame Intensity**: **13.01%**
+6. **Gas-to-Smoke Ratio ($R_{GS}$)**: **10.35%**
+7. **DHT22 Relative Humidity**: **3.97%**
+8. **Gas Derivative $\frac{dGas}{dt}$**: **3.58%**
+9. **Smoke Derivative $\frac{dSmoke}{dt}$**: **2.90%**
+10. **Thermal-Optical Interaction ($I_{TO}$)**: **1.89%**
 
 ---
 

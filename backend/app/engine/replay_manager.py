@@ -1,5 +1,5 @@
 """
-CSV Replay Manager for VIT FF180 Smart Fire Detection System.
+CSV Replay Manager for PYROSENTRY AI Industrial Telemetry System.
 Reads and streams pre-recorded benchmark runs (e.g., from Stefan Blattmann Kaggle dataset)
 at 1 Hz through the live signal processing, ML classification, and XAI pipeline.
 """

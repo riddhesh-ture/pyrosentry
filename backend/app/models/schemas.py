@@ -1,5 +1,5 @@
 """
-Pydantic Schemas for VIT FF180 Smart Fire Detection System.
+Pydantic Schemas for PYROSENTRY AI Industrial Telemetry System.
 Provides strict typing for telemetry streaming, model inferences, XAI attributions, and controls.
 """
 
@@ -46,11 +46,13 @@ class AlertState(BaseModel):
 class SensorFaultState(BaseModel):
     mq2_disconnected: bool = False
     dht22_frozen: bool = False
+    dht22_saturated: bool = False  # Set true if temperature > 80.0°C (hardware rating limit)
 
 class TelemetryPacket(BaseModel):
     timestamp: str
     frame_id: int
     mode: str  # "SIMULATION", "CSV_REPLAY", "HARDWARE_SERIAL"
+    hardware_source: str = "VIRTUAL_CONTROLLER"  # "ESP32_HARDWARE (COM3)" or "VIRTUAL_CONTROLLER"
     active_scenario: str
     sensors: SensorReadings
     derivatives: RollingDerivatives
@@ -64,7 +66,7 @@ class ScenarioSwitchRequest(BaseModel):
     scenario: str  # "NOMINAL", "COOKING_SMOKE", "GAS_LEAK", "ELECTRICAL_FIRE", "LPG_FIRE"
 
 class ModeSwitchRequest(BaseModel):
-    mode: str  # "SIMULATION", "CSV_REPLAY"
+    mode: str  # "SIMULATION", "CSV_REPLAY", "HARDWARE_SERIAL"
 
 class ReplayControlRequest(BaseModel):
     filename: Optional[str] = None
@@ -82,4 +84,3 @@ class ManualOverrideRequest(BaseModel):
     smoke: Optional[float] = None
     lpg_gas: Optional[float] = None
     flame: Optional[float] = None
-

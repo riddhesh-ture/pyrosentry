@@ -1,5 +1,5 @@
 """
-Model Training & Evaluation Script for VIT FF180 Smart Fire Detection System.
+Model Training & Evaluation Script for PYROSENTRY AI Industrial Telemetry System.
 Trains a Scikit-Learn RandomForestClassifier on multi-sensor features including
 1st-order rate-of-rise metrics and interaction ratios.
 Exports trained model artifact (.joblib) and comprehensive viva defense metrics (.json).

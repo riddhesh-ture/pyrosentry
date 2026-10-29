@@ -4,6 +4,7 @@ import {
   Paper,
   Typography,
   LinearProgress,
+  Chip,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
@@ -83,9 +84,25 @@ export const DerivativeMeters: React.FC<DerivativeMetersProps> = ({
         <Typography variant="caption" sx={{ fontWeight: 800, color: '#94a3b8', letterSpacing: '0.05em' }}>
           DYNAMIC RATE-OF-RISE DERIVATIVES (SLIDING WINDOW W = 5s)
         </Typography>
-        <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'monospace', fontSize: '0.7rem' }}>
-          1ST-ORDER DISCRETE DIFFERENCES
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {sensors.temp > 80.0 && (
+            <Chip
+              label="DHT22 SENSOR SATURATED (>80°C)"
+              size="small"
+              sx={{
+                height: 18,
+                fontSize: '0.62rem',
+                fontWeight: 900,
+                backgroundColor: 'rgba(255, 0, 60, 0.2)',
+                color: '#ff003c',
+                border: '1px solid #ff003c',
+              }}
+            />
+          )}
+          <Typography variant="caption" sx={{ color: '#64748b', fontFamily: 'monospace', fontSize: '0.7rem' }}>
+            1ST-ORDER DISCRETE DIFFERENCES
+          </Typography>
+        </Box>
       </Box>
 
       <Box

@@ -49,12 +49,14 @@ export interface AlertState {
 export interface SensorFaultState {
   mq2_disconnected: boolean;
   dht22_frozen: boolean;
+  dht22_saturated?: boolean;
 }
 
 export interface TelemetryPacket {
   timestamp: string;
   frame_id: number;
   mode: 'SIMULATION' | 'CSV_REPLAY' | 'HARDWARE_SERIAL';
+  hardware_source?: string;
   active_scenario: string;
   sensors: SensorReadings;
   derivatives: RollingDerivatives;

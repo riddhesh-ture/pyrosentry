@@ -1,14 +1,20 @@
 """
-Backend Entrypoint Script for VIT FF180 Smart Fire Detection System.
-Launches FastAPI on port 8000 with uvicorn.
+Backend Entrypoint Script for PYROSENTRY AI Industrial Telemetry SCADA.
+Launches FastAPI daemon on port 8000 (or PORT env var) with uvicorn.
+Works seamlessly both locally and when containerized.
 """
 
-import uvicorn
 import os
 import sys
+import uvicorn
 
 if __name__ == "__main__":
-    # Add backend directory to PYTHONPATH
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "app"))
-    print("[Backend Launcher] Starting FastAPI Daemon on http://127.0.0.1:8000")
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False, log_level="info")
+    # Ensure backend/app is in PYTHONPATH
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    app_dir = os.path.join(current_dir, "app")
+    if app_dir not in sys.path:
+        sys.path.insert(0, app_dir)
+
+    port = int(os.environ.get("PORT", 8000))
+    print(f"[Backend Launcher] Starting FastAPI Daemon on http://127.0.0.1:{port}")
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False, log_level="info")
